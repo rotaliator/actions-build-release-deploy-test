@@ -1,0 +1,45 @@
+{:tasks
+ {:requires ([clojure.string :as str])
+
+  build
+  (let [version (str/trim (slurp "resources/VERSION"))]
+    (println "building...")
+    (shell "mkdir -p target")
+    (shell (format "tar -caf target/release-%s.tar.gz src/" version)))
+
+  clean
+  (shell "rm -rf target")
+
+  pre-release
+  (let [version
+        (-> (slurp "resources/VERSION")
+            (str/trim)
+            (str/replace (re-pattern "-snapshot") ""))]
+    (println "pre-release")
+    (spit "resources/VERSION" version))
+
+  post-release
+  (let [version
+        (-> (slurp "resources/VERSION")
+            (str/trim)
+            (str/replace (re-pattern "-snapshot") ""))
+
+        next-version
+        (-> version
+            (str/split (re-pattern "\\."))
+            (as-> $ (mapv (fn [i] (Integer/parseInt i)) $))
+            (update 2 inc)
+            (as-> $ (str/join "." $))
+            (str "-snapshot"))]
+    (println "post-release")
+    (println "next version" next-version)
+    (spit "resources/VERSION" next-version))
+
+  release
+  (do (run 'pre-release)
+      (run 'build)
+      (run 'post-release))
+
+
+
+  }}
