@@ -15,8 +15,22 @@ jobs:
         with:
           version: '1.4.192'
 
-      - name: babashka version
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Babashka version
         run: bb --version
 
-      - name: build
-        run: bb run build
+      - name: Run tests
+        run: echo "testing..."
+
+      - name: Release
+        run: bb run release
+
+      - name: Commit version
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          file_pattern: resources/VERSION
+
+      - name: Deploy
+        run: echo "deploying..."
