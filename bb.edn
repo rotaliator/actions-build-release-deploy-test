@@ -36,7 +36,8 @@
     (spit "resources/VERSION" next-version))
 
   release
-  (do (run 'pre-release)
+  (do (println *command-line-args*)
+      (run 'pre-release)
       (run 'build)
       (run 'post-release))
 

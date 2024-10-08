@@ -1,0 +1,22 @@
+name: Release new version
+on:
+  workflow_dispatch:
+
+jobs:
+  clojure:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install babashka
+        uses: just-sultanov/setup-babashka@v2
+        with:
+          version: '1.4.192'
+
+      - name: babashka version
+        run: bb --version
+
+      - name: build
+        run: bb run build
