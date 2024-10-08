@@ -27,10 +27,15 @@ jobs:
       - name: Release
         run: bb run release
 
+      - name: Set commit message
+        run: echo "MESSAGE=new version `cat resources/VERSION`" >> $GITHUB_OUTPUT
+
       - name: Commit version
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          commit_user_name: 🤖
           file_pattern: resources/VERSION
+          commit_message: ${{ steps.set_commit_message.outputs.MESSAGE }}
 
       - name: Deploy
         run: echo "deploying..."
