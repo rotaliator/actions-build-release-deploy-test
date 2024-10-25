@@ -1,0 +1,61 @@
+name: Release new version
+on:
+  workflow_dispatch:
+
+jobs:
+  clojure:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install babashka
+        uses: just-sultanov/setup-babashka@v2
+        with:
+          version: '1.4.192'
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: echo "testing..."
+
+      - name: Pre-release
+        run: bb run pre-release
+
+      - name: Tag
+        id: tag
+        run: |
+          tag=v$(cat resources/VERSION)
+          message='new version ${tag}'
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${tag}" -m "${message}"
+          git push origin "${tag}"
+
+      - name: Build
+        run: bb run build
+
+      - name: Create a Release
+        id: create_release
+        uses: shogo82148/actions-create-release@v1
+        with:
+          tag_name: v$(cat resources/VERSION)
+          draft: false
+
+      - name: Upload Assets
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/*.tar.gz
+
+      - name: Post Release
+        run: bb run post-release
+
+      - name: Commit version
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_user_name: 🤖
+          file_pattern: resources/VERSION
+          commit_message: new version $(cat resources/VERSION)
