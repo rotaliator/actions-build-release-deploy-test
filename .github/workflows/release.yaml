@@ -24,15 +24,15 @@ jobs:
       - name: Pre-release
         run: bb run pre-release
 
-      - name: Tag
-        id: tag
-        run: |
-          tag=v$(cat resources/VERSION)
-          message='new version ${tag}'
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag -a "${tag}" -m "${message}"
-          git push origin "${tag}"
+      # - name: Tag
+      #   id: tag
+      #   run: |
+      #     tag=v$(cat resources/VERSION)
+      #     message='new version ${tag}'
+      #     git config user.name "${GITHUB_ACTOR}"
+      #     git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      #     git tag -a "${tag}" -m "${message}"
+      #     git push origin "${tag}"
 
       - name: Build
         run: bb run build
@@ -42,7 +42,7 @@ jobs:
         uses: shogo82148/actions-create-release@v1
         with:
           tag_name: v$(cat resources/VERSION)
-          draft: false
+          release_name: v$(cat resources/VERSION)
 
       - name: Upload Assets
         uses: shogo82148/actions-upload-release-asset@v1
