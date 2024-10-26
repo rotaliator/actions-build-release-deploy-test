@@ -28,7 +28,7 @@ jobs:
         id: tag
         run: |
           tag=v$(cat resources/VERSION)
-          message='new version ${tag}'
+          message='new version $tag'
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git tag -a "${tag}" -m "${message}"
